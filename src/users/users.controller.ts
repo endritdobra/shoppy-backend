@@ -3,7 +3,7 @@ import { CreateUserRequest } from './dto/create-user.request';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
-import type { TokenPayload } from '../auth/token-payload.interface';
+import { TokenPayload } from '../auth/token-payload.interface';
 
 @Controller('users')
 export class UsersController {

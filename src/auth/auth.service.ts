@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import ms from 'ms';
 import * as bcrypt from 'bcrypt';
-import { User } from '../../generated/prisma';
+import { User } from '@prisma/client';
 import { Response } from 'express';
 import { UsersService } from '../users/users.service';
 import { ConfigService } from '@nestjs/config';
@@ -16,12 +16,11 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  login(user: User, response: Response) {
+  async login(user: User, response: Response) {
     const expires = new Date();
     expires.setMilliseconds(
       expires.getMilliseconds() +
-      Number(this.configService.getOrThrow<string>('JWT_EXPIRATION')) *
-      1000,
+        ms(this.configService.getOrThrow<string>('JWT_EXPIRATION')),
     );
 
     const tokenPayload: TokenPayload = {
