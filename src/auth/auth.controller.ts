@@ -1,13 +1,13 @@
 import { Controller, Post, Res, UseGuards } from '@nestjs/common';
+import type { User } from '../../generated/prisma';
+import type { Response } from 'express';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CurrentUser } from './current-user.decorator';
-import type { User } from '../../generated/prisma';
 import { AuthService } from './auth.service';
-import type { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
