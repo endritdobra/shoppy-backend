@@ -17,6 +17,16 @@ export class ProductsService {
     });
   }
 
+  async getProduct(productId: number) {
+    const products = await this.prismaService.product.findMany();
+    return Promise.all(
+      products.map(async (product) => ({
+        ...product,
+        imageExists: await this.imageExists(product.id),
+      })),
+    );
+  }
+
   async getProducts() {
     const products = await this.prismaService.product.findMany();
     return Promise.all(
