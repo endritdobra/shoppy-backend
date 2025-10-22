@@ -4,8 +4,10 @@ import {
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
+  Param,
   ParseFilePipe,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -18,6 +20,7 @@ import { ProductsService } from './products.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { PRODUCT_IMAGES } from './product-images';
 
 @Controller('products')
 export class ProductsController {
@@ -34,19 +37,7 @@ export class ProductsController {
 
   @Post(':productId/image')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: 'public/products',
-        filename: (req, file, callback) => {
-          callback(
-            null,
-            `${req.params.productId}${extname(file.originalname)}`,
-          );
-        },
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('image'))
   uploadProductImage(
     @UploadedFile(
       new ParseFilePipe({
@@ -56,12 +47,21 @@ export class ProductsController {
         ],
       }),
     )
-    _file: Express.Multer.File,
-  ) {}
+    file: Express.Multer.File,
+    @Param('productId') productId: string,
+  ) {
+    return this.productsService.uploadProductImage(productId, file.buffer);
+  }
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getProducts() {
-    return this.productsService.getProducts();
+  async getProducts(@Query('status') status?: string) {
+    return this.productsService.getProducts(status);
+  }
+
+  @Get(':productId')
+  @UseGuards(JwtAuthGuard)
+  async getProduct(@Param('productId') productId: string) {
+    return this.productsService.getProduct(+productId);
   }
 }

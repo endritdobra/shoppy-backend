@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import ms from 'ms';
-import * as bcrypt from 'bcrypt';
+import * as bcryptjs from 'bcryptjs';
 import { User } from '@prisma/client';
 import { Response } from 'express';
 import { UsersService } from '../users/users.service';
@@ -40,7 +40,7 @@ export class AuthService {
   async verifyUser(email: string, password: string) {
     try {
       const user = await this.usersService.getUser({ email });
-      const authenticated = await bcrypt.compare(password, user.password);
+      const authenticated = await bcryptjs.compare(password, user.password);
       if (!authenticated) {
         throw new UnauthorizedException();
       }
@@ -48,5 +48,9 @@ export class AuthService {
     } catch (err) {
       throw new UnauthorizedException('Credentials are not valid.');
     }
+  }
+
+  verifyToken(jwt: string) {
+    this.jwtService.verify(jwt);
   }
 }
